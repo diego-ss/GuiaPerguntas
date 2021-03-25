@@ -9,6 +9,30 @@
         <h1><%=pergunta.titulo%></h1>
         <p><%=pergunta.descricao%></p>
         <hr>
+
+        <form method="POST" action="/salvarresposta">
+            <h3>colabore com uma resposta!</h3>
+            <br>
+            <textarea required placeholder="digite sua resposta" class="form-control" 
+            name="txtResposta"></textarea>
+            <br>
+            <input type="hidden" name="perguntaId" value="<%= pergunta.id %>">
+            <button type="submit" class="btn btn-primary">responder!</button>
+        </form>
+        <hr>
+        <br>
+        <h3>Respostas cadastradas:</h3>
+        <hr>
+
+        <% if(respostas) {%>
+            <% respostas.forEach(resposta =>{%>
+                <%if(resposta.texto != "") {%>
+                    <%=resposta.texto%>
+                    <br>
+                    <br>
+                <%}%>
+            <%})%>
+        <%}%>
     </div>
     
 </body>

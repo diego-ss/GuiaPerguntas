@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 const connection = require("./database/database");
 //puxando model da pergunta
 const PerguntaDAO = require("./database/Pergunta");
+const RespostaDAO = require("./database/Resposta");
 
 //DATABASE
 connection.authenticate()
@@ -68,19 +69,46 @@ app.post("/salvarpergunta", (req, res) => {
 
 });
 
+//rota para visualizar pergunta
 app.get("/pergunta/:id", (req, res) => {
     const id = req.params["id"];
 
     PerguntaDAO.findOne({
         where: {id: id}
     }).then(pergunta => {
-        if(pergunta){
-            res.render("pergunta", {
-                pergunta: pergunta
-            });
+        if(pergunta != undefined){
+
+            RespostaDAO.findAll({
+                where: {perguntaId: pergunta.id},
+                order: [['id', 'DESC']]
+            }).then(respostas => {
+                res.render("pergunta", {
+                    pergunta: pergunta,
+                    respostas: respostas
+                });
+            }).catch((erro) => {
+                console.log(erro);
+                res.redirect("/");
+            });          
         } else {
             res.redirect("/");
         }
+    });
+});
+
+//rota para salvar resposta
+app.post("/salvarresposta", (req, res)=>{
+    var textoResposta = req.body.txtResposta;
+    var perguntaId = req.body.perguntaId;
+
+    RespostaDAO.create({
+        texto: textoResposta,
+        perguntaId: perguntaId
+    }).then(()=>{
+        res.redirect("/pergunta/" + perguntaId);
+    })
+    .catch((erro) => {
+        res.redirect("/");
     });
 });
 
